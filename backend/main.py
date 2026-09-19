@@ -8,6 +8,7 @@ from analyzer import calculate_match
 app = FastAPI(title="AI Resume Analyzer API")
 
 
+# Allow the frontend to communicate with the backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -39,7 +40,7 @@ async def analyze_resume(
         filetype="pdf"
     )
 
-    # Extract resume text
+    # Extract text from all pages
     resume_text = ""
 
     for page in pdf:
@@ -47,22 +48,18 @@ async def analyze_resume(
 
     pdf.close()
 
-    # Analyze skills
+    # Analyze resume against job description
     analysis = calculate_match(
         resume_text,
         job_description
     )
 
+    # Return analysis result
     return {
         "filename": resume.filename,
-
         "match_score": analysis["match_score"],
-
         "resume_skills": analysis["resume_skills"],
-
         "job_skills": analysis["job_skills"],
-
         "matched_skills": analysis["matched_skills"],
-
         "missing_skills": analysis["missing_skills"]
     }
