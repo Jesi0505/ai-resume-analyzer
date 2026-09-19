@@ -2,11 +2,12 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import fitz
 
+from analyzer import calculate_match
+
 
 app = FastAPI(title="AI Resume Analyzer API")
 
 
-# Allow the frontend to communicate with the backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -32,10 +33,13 @@ async def analyze_resume(
     # Read uploaded PDF
     pdf_data = await resume.read()
 
-    # Open PDF from memory
-    pdf = fitz.open(stream=pdf_data, filetype="pdf")
+    # Open PDF
+    pdf = fitz.open(
+        stream=pdf_data,
+        filetype="pdf"
+    )
 
-    # Extract text from all pages
+    # Extract resume text
     resume_text = ""
 
     for page in pdf:
@@ -43,8 +47,22 @@ async def analyze_resume(
 
     pdf.close()
 
+    # Analyze skills
+    analysis = calculate_match(
+        resume_text,
+        job_description
+    )
+
     return {
         "filename": resume.filename,
-        "resume_text": resume_text,
-        "job_description": job_description
+
+        "match_score": analysis["match_score"],
+
+        "resume_skills": analysis["resume_skills"],
+
+        "job_skills": analysis["job_skills"],
+
+        "matched_skills": analysis["matched_skills"],
+
+        "missing_skills": analysis["missing_skills"]
     }
