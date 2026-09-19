@@ -1,5 +1,3 @@
-# Skills that our analyzer can recognize
-
 SKILLS = [
     "python",
     "java",
@@ -34,9 +32,7 @@ SKILLS = [
 
 
 def find_skills(text):
-    """
-    Find recognized skills in a given text.
-    """
+    """Find recognized skills in the given text."""
 
     text = text.lower()
 
@@ -50,9 +46,7 @@ def find_skills(text):
 
 
 def calculate_match(resume_text, job_description):
-    """
-    Compare resume skills with job description skills.
-    """
+    """Compare resume skills with job description skills."""
 
     resume_skills = find_skills(resume_text)
     job_skills = find_skills(job_description)
@@ -67,7 +61,7 @@ def calculate_match(resume_text, job_description):
         if skill not in resume_skills
     ]
 
-    if len(job_skills) > 0:
+    if job_skills:
         match_score = round(
             (len(matched_skills) / len(job_skills)) * 100
         )
